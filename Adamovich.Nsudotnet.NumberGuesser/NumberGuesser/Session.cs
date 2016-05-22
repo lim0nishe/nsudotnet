@@ -57,16 +57,13 @@ namespace NumberGuesser
                 }
                 if (answer == target)
                 {
-                    // будем считать, что никто не станет играть днями напролет
-                    int time = (DateTime.Now.Minute - startTime.Minute) + (DateTime.Now.Hour - startTime.Hour)*60;
+                    int time = (int) DateTime.Now.Subtract(startTime).TotalMinutes;
 
-                    var builder = new StringBuilder();
-                    builder.Append("Ok, you are right\n");
-                    builder.Append("Number of attempts: ");
-                    builder.Append(count.ToString());
-                    builder.Append("\nYour answers: ");
+                    Console.WriteLine("Ok, you are right");
+                    Console.Write("Number of attempts: ");
+                    Console.WriteLine(count.ToString());
+                    Console.WriteLine("Your answers: ");
                     _history[count - 1] = answer + " Right!"; 
-                    Console.WriteLine(builder.ToString());
                     for(var i =0; i < count; i++)
                     {
                         Console.WriteLine(_history[i]);
