@@ -37,6 +37,8 @@ namespace Rss2Email
                         _messager.AddRecord(tmp);
                 }
                 LastReading = DateTime.Now;
+
+                xmlStream.Dispose();
             }
             catch (Exception e)
             {
@@ -57,6 +59,7 @@ namespace Rss2Email
 
             Console.WriteLine("press Enter to stop forwading messages");
             Console.ReadLine();
+            timer.Dispose();
         }
 
     }

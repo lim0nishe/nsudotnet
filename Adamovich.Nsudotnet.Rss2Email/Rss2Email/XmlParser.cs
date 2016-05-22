@@ -17,8 +17,7 @@ namespace Rss2Email
             {
                 var doc = new XmlDocument();
                 doc.Load(source); 
-                XmlNode channelNode = doc.DocumentElement["channel"];
-
+                XmlNode channelNode = doc.DocumentElement["channel"];                
                 var itemList = new List<Item>();
 
                 string language = "";

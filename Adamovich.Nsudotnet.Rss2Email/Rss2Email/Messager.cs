@@ -55,7 +55,9 @@ namespace Rss2Email
                 client.Credentials = new NetworkCredential(Sender.Split('@')[0], Password);
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 client.Send(mail);
+
                 mail.Dispose();
+                client.Dispose();
                 Buffer.Clear();
             }
             catch (Exception e)
