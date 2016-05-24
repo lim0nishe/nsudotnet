@@ -1,21 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
+﻿using System.Text;
+using System.Xml.Serialization;
 
 namespace Rss2Email
 {
-    class Item : Record
+    [XmlRoot("item")]
+    public class Item : Record
     {
+        [XmlElement("title")]
         public string Title { get; set; }
 
+        [XmlElement("link")]
         public string Link { get; set; }
+
+        [XmlElement("description")]
         public string Description { get; set; }
+
+        [XmlElement("category")]
         public string Category { get; set; }
-        public DateTime PubDate { get; set; }
+
+        [XmlElement("pubDate")]
+        public string PubDate { get; set; }
+
+        //[XmlElement("pubDate")]
+        //public string ProxyDate
+        //{
+        //    set { PubDate = DateTime.Parse(value); }
+        //}
 
         public Item(string title, string link, string description, string category, string pubDate)
         {
@@ -23,22 +33,21 @@ namespace Rss2Email
             Link = link;
             Description = description;
             Category = category;
-            PubDate = DateTime.Parse(pubDate);
+            PubDate = pubDate;
         }
+
+        public Item(){}
 
         public override string ToString()
         {
             var builder = new StringBuilder();
-            builder.Append(Title);
-            builder.Append("\n");
-            builder.Append(Link);
-            builder.Append("\n");
-            builder.Append(Description);
-            builder.Append("\n");
+            builder.AppendLine(Title);
+            builder.AppendLine(Link);
+            builder.AppendLine(Description);
             builder.Append(PubDate);
             builder.Append("\nCategory: ");
-            builder.Append(Category);
-            builder.Append("\n-------------------------------------------------------------------------------\n");
+            builder.AppendLine(Category);
+            builder.AppendLine("-------------------------------------------------------------------------------");
             return builder.ToString();
         }
 

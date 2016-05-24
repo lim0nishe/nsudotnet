@@ -1,32 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
+using System.Xml.Serialization;
 
 namespace Rss2Email
 {
-    class Channel : Record
+    [XmlRoot("channel")]
+    public class Channel : Record
     {
+        [XmlElement("title")]
         public string Title { get; set; }
+
+        [XmlElement("description")]
         public string Description { get; set; }
+
+        [XmlElement("link")]
         public string Link { get; set; }
+
+        [XmlElement("language")]
         public string Language { get; set; }
-        // можно добавить картинку
 
         public override string ToString()
         {
             var builder = new StringBuilder();
-            builder.Append("-------------------------------------------------------------------------------\n");
+            builder.AppendLine("-------------------------------------------------------------------------------");
             builder.Append("Language: ");
-            builder.Append(Language);
-            builder.Append("\n");
+            builder.AppendLine(Language);
             builder.Append(Title);
             builder.Append(": ");
-            builder.Append(Description);
-            builder.Append("\n");
-            builder.Append(Link);
-            builder.Append("\n-------------------------------------------------------------------------------\n");
+            builder.AppendLine(Description);
+            builder.AppendLine(Link);
+            builder.AppendLine("-------------------------------------------------------------------------------");
             return builder.ToString();
         }
 
@@ -36,6 +38,14 @@ namespace Rss2Email
             Description = description;
             Link = link;
             Language = language;
+        }
+
+        public Channel()
+        {
+            Title = "";
+            Description = "";
+            Link = "";
+            Language = "";
         }
 
         public override bool Equals(object obj)

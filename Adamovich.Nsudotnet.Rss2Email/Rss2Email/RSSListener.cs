@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
@@ -24,21 +20,20 @@ namespace Rss2Email
             try
             {
                 var wrGetRequest = WebRequest.Create(RssAddress);
-                Stream xmlStream;
-                xmlStream = wrGetRequest.GetResponse().GetResponseStream();
-
-                List<Item> news;
-                Channel channel = XmlParser.Parse(out news, xmlStream);
-
-                _messager.AddRecord(channel);
-                foreach (var tmp in news)
+                using (Stream xmlStream = wrGetRequest.GetResponse().GetResponseStream())
                 {
-                    if (tmp.PubDate.CompareTo(LastReading) > 0)
-                        _messager.AddRecord(tmp);
-                }
-                LastReading = DateTime.Now;
 
-                xmlStream.Dispose();
+                    List<Item> news;
+                    Channel channel = XmlParser.Parse(out news, xmlStream);
+
+                    _messager.AddRecord(channel);
+                    foreach (var tmp in news)
+                    {
+                        if (DateTime.Parse(tmp.PubDate).CompareTo(LastReading) > 0)
+                            _messager.AddRecord(tmp);
+                    }
+                    LastReading = DateTime.Now;
+                }
             }
             catch (Exception e)
             {
@@ -49,17 +44,18 @@ namespace Rss2Email
         public void StartListen(string mailAddress, string sender, string password)
         {
             _messager = new Messager { MailAddress = mailAddress, Sender = sender, Password = password };
-            var timer = new Timer
+            using (var timer = new Timer
             {
                 Interval = this.Interval,
                 AutoReset = true
-            };
-            timer.Elapsed += GetResult;
-            timer.Enabled = true;
+            })
+            {
+                timer.Elapsed += GetResult;
+                timer.Enabled = true;
 
-            Console.WriteLine("press Enter to stop forwading messages");
-            Console.ReadLine();
-            timer.Dispose();
+                Console.WriteLine("press Enter to stop forwading messages");
+                Console.ReadLine();
+            }
         }
 
     }

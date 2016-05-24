@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Rss2Email
 {
@@ -38,27 +35,29 @@ namespace Rss2Email
         {
             try
             {
-                var mail = new MailMessage();
-                mail.From = new MailAddress(Sender);
-                mail.To.Add(new MailAddress(MailAddress));
-                mail.Subject = "RSS";
+                using (var mail = new MailMessage())
+                {
+                    mail.From = new MailAddress(Sender);
+                    mail.To.Add(new MailAddress(MailAddress));
+                    mail.Subject = "RSS";
 
-                var builder = new StringBuilder();
-                foreach (var record in Buffer)
-                    builder.Append(record);
-                mail.Body = builder.ToString();
+                    var builder = new StringBuilder();
+                    foreach (var record in Buffer)
+                        builder.Append(record);
+                    mail.Body = builder.ToString();
 
-                var client = new SmtpClient();
-                client.Host = SmtpServer;
-                client.Port = Port;
-                client.EnableSsl = EnableSsl;
-                client.Credentials = new NetworkCredential(Sender.Split('@')[0], Password);
-                client.DeliveryMethod = SmtpDeliveryMethod.Network;
-                client.Send(mail);
+                    using (var client = new SmtpClient())
+                    {
+                        client.Host = SmtpServer;
+                        client.Port = Port;
+                        client.EnableSsl = EnableSsl;
+                        client.Credentials = new NetworkCredential(Sender.Split('@')[0], Password);
+                        client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                        client.Send(mail);
 
-                mail.Dispose();
-                client.Dispose();
-                Buffer.Clear();
+                        Buffer.Clear();
+                    }
+                }
             }
             catch (Exception e)
             {

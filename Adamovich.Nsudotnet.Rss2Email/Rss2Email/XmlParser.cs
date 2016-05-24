@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
+using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace Rss2Email
 {
@@ -15,41 +13,27 @@ namespace Rss2Email
         {
             try
             {
-                var doc = new XmlDocument();
-                doc.Load(source); 
-                XmlNode channelNode = doc.DocumentElement["channel"];                
+                var doc = XDocument.Load(source); 
+                 
                 var itemList = new List<Item>();
 
-                string language = "";
-                string title = "";
-                string description = "";
-                string link = "";
+                XElement channelElement = doc.Descendants("channel").First();
+                XmlSerializer channelSerializer = new XmlSerializer(typeof(Channel));
 
-                foreach (XmlNode node in channelNode)
+                Channel channel = channelSerializer.Deserialize(channelElement.CreateReader()) as Channel;
+
+                XmlSerializer itemSerializer = new XmlSerializer(typeof(Item));
+                IEnumerable<XElement> xmlItems = channelElement.Descendants("item");
+                foreach (var item in xmlItems)
                 {
-                    switch (node.Name)
-                    {
-                        case "description":
-                            description = node.InnerText;
-                            break;
-                        case "language":
-                            language = node.InnerText;
-                            break;
-                        case "title":
-                            title = node.InnerText;
-                            break;
-                        case "link":
-                            link = node.InnerText;
-                            break;
-                        case "item":
-                            itemList.Add(new Item(node["title"].InnerText, node["link"].InnerText, node["description"].InnerText,
-                                node["category"].InnerText, node["pubDate"].InnerText));
-                            break;
-                    }
+                    Item tmp = itemSerializer.Deserialize(item.CreateReader()) as Item;
+                    itemList.Add(tmp);
                 }
-                Channel channel = new Channel(language, title, description, link);
+
                 items = itemList;
                 return channel;
+                
+
             }
             catch (NullReferenceException e)
             {
